@@ -89,11 +89,17 @@ Only the **shop manager (admin)** can:
 ```
 unistyle/
 ├── DOCUMENTATION.md              ← This file
-├── index.html                    ← The single HTML page that loads the React app
+├── index.html                    ← The single HTML page that loads the React app + SEO meta tags
+├── public/
+│   └── favicon.png               ← UniStyle logo shown in the browser tab
 ├── src/
 │   ├── main.tsx                  ← Entry point — starts the React app
 │   ├── App.tsx                   ← Defines all the URLs (routes) of the website
-│   ├── index.css                 ← Global colors, fonts, theme
+│   ├── index.css                 ← Brand design tokens (teal/gold), global theme
+│   │
+│   ├── assets/
+│   │   ├── unistyle-logo.png     ← Full wordmark logo (used in home hero)
+│   │   └── unistyle-mark.png     ← Icon-only mark (used in navbar)
 │   │
 │   ├── components/
 │   │   ├── Navbar.tsx            ← Top navigation bar (logo, cart, login button)
@@ -101,7 +107,7 @@ unistyle/
 │   │   └── ProtectedRoute.tsx    ← Blocks pages from non-logged-in users
 │   │
 │   ├── pages/
-│   │   ├── Index.tsx             ← Home page (hero + product grid + filter)
+│   │   ├── Index.tsx             ← Home page (hero with logo + product grid + filter)
 │   │   ├── Auth.tsx              ← Login + Signup form
 │   │   ├── ProductDetail.tsx     ← Single product page with Add to Cart
 │   │   ├── Cart.tsx              ← Shopping cart page
@@ -124,12 +130,15 @@ unistyle/
 ### What does each file do (in plain English)?
 | File | What it does |
 |---|---|
-| `App.tsx` | The “map” of the website — says which page opens at `/cart`, `/auth`, etc. |
-| `Navbar.tsx` | The black/white bar at the top with the cart icon and login button. |
-| `useAuth.tsx` | A “memory” that remembers if you are logged in. |
-| `client.ts` | The “telephone line” to the database. Whenever we need data, we use this. |
-| `Index.tsx` | The home page — what you see when you open the website. |
+| `App.tsx` | The "map" of the website — says which page opens at `/cart`, `/auth`, etc. |
+| `Navbar.tsx` | Top bar with the UniStyle icon, brand name, cart, orders, admin & login buttons. |
+| `index.css` | The **brand design system** — teal/gold colors, gradients, shadows. |
+| `useAuth.tsx` | A "memory" that remembers if you are logged in and whether you are admin. |
+| `client.ts` | The "telephone line" to the database. Whenever we need data, we use this. |
+| `Index.tsx` | The home page — UniStyle logo hero + filterable product grid. |
 | `Cart.tsx` | Shows what's in your shopping basket and lets you change it. |
+| `unistyle-logo.png` | Big wordmark used in the homepage hero. |
+| `unistyle-mark.png` | Small icon shown in the navbar on every page. |
 
 ---
 
