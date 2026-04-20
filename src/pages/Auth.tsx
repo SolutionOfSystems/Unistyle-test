@@ -62,7 +62,7 @@ export default function Auth() {
     <main className="container mx-auto px-4 py-12 max-w-md">
       <Card>
         <CardHeader>
-          <CardTitle as="h1">{mode === "login" ? "Welcome back" : "Create your account"}</CardTitle>
+          <CardTitle>{mode === "login" ? "Welcome back" : "Create your account"}</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

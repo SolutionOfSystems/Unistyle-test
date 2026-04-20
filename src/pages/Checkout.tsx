@@ -94,7 +94,7 @@ export default function Checkout() {
       <h1 className="text-3xl font-bold mb-6">Checkout</h1>
 
       <Card className="mb-6">
-        <CardHeader><CardTitle as="h2" className="text-lg">Order Summary</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-lg">Order Summary</CardTitle></CardHeader>
         <CardContent>
           <ul className="space-y-2 text-sm mb-4">
             {items.map((i) => (
@@ -111,7 +111,7 @@ export default function Checkout() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle as="h2" className="text-lg">Shipping Information</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-lg">Shipping Information</CardTitle></CardHeader>
         <CardContent>
           <form onSubmit={placeOrder} className="space-y-4">
             <div>
