@@ -142,6 +142,203 @@ unistyle/
 
 ---
 
+## 3.5 Folder & File Structure — Explained Like You're 12 🧒
+
+Imagine the whole website is a **giant LEGO castle**. Every folder is a **room** in the castle, and every file is a **LEGO brick** with a special job. Let's walk through the castle one room at a time.
+
+### 🏠 The Front Door — `index.html`
+This is the **front door** of the castle. When someone types our website address in their browser, this is the very first thing that opens.
+- It's just a tiny HTML page with one empty `<div id="root">`.
+- React then "moves in" and fills that empty div with our entire app.
+- It also holds the **page title** ("UniStyle"), the **favicon** (browser tab icon), and SEO tags (so Google knows what our site is about).
+
+### 🔌 The Power Switch — `src/main.tsx`
+This is the **power switch** that turns React on.
+- It grabs the empty `<div id="root">` from `index.html`.
+- It tells React: "Hey, render the `<App />` component inside this div."
+- Without this file, nothing would appear on screen — like a TV with no power.
+
+### 🗺️ The Map — `src/App.tsx`
+This file is like a **map of the castle**. It says: "If a visitor walks to door `/cart`, show them the Cart room. If they walk to `/auth`, show them the Login room."
+- It uses a tool called **React Router** to handle URLs.
+- It also wraps the whole app in helpers like `AuthProvider` (remembers who's logged in) and `QueryClientProvider` (helps load data smoothly).
+- Think of it as the **hallway** that connects all the rooms.
+
+### 🎨 The Paint & Decorations — `src/index.css`
+This is the castle's **paint bucket and decoration kit**.
+- It defines all our **brand colors** (teal, gold, warm white) as reusable variables.
+- Anywhere in the app where we write `bg-primary`, it pulls the teal color from here.
+- Change one line here, and the whole castle gets repainted instantly. Magic! ✨
+
+---
+
+### 📦 The `public/` Room — Public Goodies
+Anything inside `public/` is served **as-is** to the browser, no processing.
+- `favicon.png` — the tiny icon you see in the browser tab.
+- `robots.txt` — a note for Google's web crawlers saying "yes, please index this site."
+- `placeholder.svg` — a fallback image we show when a product has no picture.
+
+> 💡 Rule of thumb: if you want a file to be downloadable by URL directly (like `mysite.com/favicon.png`), put it in `public/`.
+
+---
+
+### 🖼️ The `src/assets/` Room — Brand Pictures
+This is the **art gallery**. It holds images that are part of our app's design (not user-uploaded photos).
+- `unistyle-logo.png` — the big wordmark logo on the home page hero.
+- `unistyle-mark.png` — the small icon-only mark in the navbar.
+
+When we `import logo from "@/assets/unistyle-logo.png"` in a component, the build tool (Vite) **optimizes and bundles** these images automatically.
+
+---
+
+### 🧱 The `src/components/` Room — Reusable LEGO Bricks
+A **component** is a small, reusable piece of UI. Think of it like a LEGO brick: build it once, snap it in wherever you need it.
+
+| File | What it is | Real-life analogy |
+|---|---|---|
+| `Navbar.tsx` | The top bar with logo, cart, orders, login | The **welcome desk** at the entrance — it's the same on every floor |
+| `ProductCard.tsx` | One product tile (image + name + price) | A **price tag on a hanger** — many tags, all look the same |
+| `ProtectedRoute.tsx` | A bouncer that blocks pages if you're not logged in | A **velvet rope** at a VIP section |
+| `NavLink.tsx` | A styled link used inside the navbar | A **signpost** pointing to a room |
+
+Inside `components/ui/` are the **shadcn/ui** building blocks (`Button`, `Card`, `Input`, `Dialog`, etc.). These are pre-built, beautiful UI pieces we use across the app — like a **bag of standard LEGO pieces** you can use to build anything.
+
+---
+
+### 📄 The `src/pages/` Room — Full Rooms in the Castle
+While **components** are bricks, **pages** are entire **rooms**. Each file here is a full screen the user can visit.
+
+| Page | URL | What happens here |
+|---|---|---|
+| `Index.tsx` | `/` | The **home page** — see the logo and browse all products |
+| `Auth.tsx` | `/auth` | The **sign-in counter** — log in or create an account |
+| `ProductDetail.tsx` | `/product/:id` | The **product display table** — see details and add to cart |
+| `Cart.tsx` | `/cart` | The **shopping basket** — review what you picked |
+| `Checkout.tsx` | `/checkout` | The **cashier counter** — enter address and place order |
+| `Orders.tsx` | `/orders` | The **receipt folder** — see all your past orders |
+| `AdminProducts.tsx` | `/admin/products` | The **stockroom** — admins add/edit/delete products |
+| `AdminOrders.tsx` | `/admin/orders` | The **manager's desk** — admins update order status |
+| `NotFound.tsx` | `*` (anything else) | A friendly **"oops, wrong room"** sign |
+
+---
+
+### 🧠 The `src/hooks/` Room — Tiny Brains
+A **hook** in React is a small reusable brain that gives a component a special power.
+
+| File | Special power |
+|---|---|
+| `useAuth.tsx` | Remembers **who's logged in** and **whether they're an admin**. Used everywhere we need to check the user. |
+| `use-toast.ts` | Lets any component **pop up a little notification** (e.g., "Added to cart!"). |
+| `use-mobile.tsx` | Tells the component **if the screen is a phone** so it can show a different layout. |
+
+> Think of hooks like **walkie-talkies** — any component can pick one up and instantly know what's happening across the app.
+
+---
+
+### 🛠️ The `src/lib/` Room — Helper Tools
+Tiny utility helpers that don't belong anywhere else.
+- `utils.ts` — has a `cn()` function that **smartly joins CSS class names** together. Used all over the app.
+
+---
+
+### 📡 The `src/integrations/supabase/` Room — Telephone to the Database
+This is the **telephone line** to our backend (Lovable Cloud / Supabase).
+- `client.ts` — creates the `supabase` object. Anywhere we want to read or save data, we import this. **Auto-generated, never edit.**
+- `types.ts` — auto-generated TypeScript types that match every table in our database. Gives us autocomplete and catches typos. **Auto-generated, never edit.**
+
+---
+
+### 🗄️ The `supabase/` Room — Backend Blueprints
+- `migrations/` — SQL files that **created** all our database tables (`products`, `orders`, `user_roles`, etc.). Like the **architectural blueprints** of the castle's basement vault.
+- `config.toml` — settings for the backend (project ID, function configs).
+
+---
+
+### ⚙️ The Castle's Rulebooks (Config Files)
+These live at the project root and tell tools **how** to build, lint, and run the app.
+
+| File | What it does (kid version) |
+|---|---|
+| `package.json` | The **shopping list** of all the libraries our app uses (React, Tailwind, etc.) |
+| `vite.config.ts` | Settings for **Vite**, the tool that bundles our code super fast |
+| `tailwind.config.ts` | Settings for **Tailwind CSS** — tells it which colors and sizes are allowed |
+| `tsconfig.json` | Settings for **TypeScript** — the language that catches bugs before they happen |
+| `eslint.config.js` | Rules for **clean code** — like a teacher checking grammar |
+| `postcss.config.js` | Helper that **processes CSS** before sending it to the browser |
+| `components.json` | Config for **shadcn/ui** — tells it where to put new UI bricks |
+| `.env` | **Secret keys** (like passwords) for connecting to the database. Auto-generated. |
+
+---
+
+### 📜 The `README.md` and `DOCUMENTATION.md`
+- `README.md` — a short intro, like the **welcome plaque** at the castle entrance.
+- `DOCUMENTATION.md` — this big book you're reading right now! 📖
+
+---
+
+## 3.6 Code Concepts — Explained for Beginners 👶
+
+Before reading the code, here are the building blocks you'll see everywhere:
+
+### 🧩 What is a "component"?
+A **component** is a JavaScript function that returns some HTML-looking code (called JSX). Example:
+```tsx
+function HelloButton() {
+  return <button>Hello!</button>;
+}
+```
+You can then use it like an HTML tag: `<HelloButton />`. Build once, reuse everywhere.
+
+### 💾 What is `useState`?
+`useState` is React's way to **remember a value** that can change.
+```tsx
+const [count, setCount] = useState(0);
+//      ↑          ↑              ↑
+//   the value   how to change it  starting value
+```
+- `count` is the current value (starts at 0).
+- `setCount(5)` changes it to 5 and **automatically re-draws the screen**.
+
+Real-life analogy: it's like a **whiteboard** — write a number on it, and anyone looking sees the new value instantly.
+
+### ⏰ What is `useEffect`?
+`useEffect` runs code **at certain moments**, like when a page first opens.
+```tsx
+useEffect(() => {
+  console.log("Page just loaded!");
+}, []);  // ← empty list = run only once at the start
+```
+We mostly use it to **fetch data** when a page opens.
+
+### 🔗 What is `async / await`?
+Some operations (like talking to the database) take time. `async/await` lets us **wait for them** without freezing the app.
+```tsx
+const data = await supabase.from("products").select("*");
+//    ↑ pauses here until the database responds, then continues
+```
+
+### 📞 What does `supabase.from("table").select("*")` mean?
+It literally means: **"From the table called X, give me all (*) the rows."** That's it. Just a fancy way to say "fetch everything from this table."
+
+### 🛡️ What is RLS (Row-Level Security)?
+A rule on the database that says **"only the owner of this row can see it."** Example: your cart can only be seen by you, never by another customer. The rules live in the database itself, so even if a hacker tries to ask for someone else's cart, the database simply refuses.
+
+### 🎨 What are Tailwind classes (`bg-primary`, `text-foreground`)?
+Instead of writing CSS in a separate file, Tailwind lets us add **tiny pre-made styles** as classes directly on HTML:
+```tsx
+<button className="bg-primary text-white px-4 py-2 rounded">
+  Click me
+</button>
+```
+- `bg-primary` = use the brand teal background
+- `text-white` = white text
+- `px-4 py-2` = padding (left/right 4, top/bottom 2)
+- `rounded` = rounded corners
+
+It's like getting **pre-cut LEGO bricks** instead of carving wood from scratch.
+
+---
+
 ## 4. Code Explanation (Important Parts)
 
 ### a) Connecting to the database (`client.ts`)
