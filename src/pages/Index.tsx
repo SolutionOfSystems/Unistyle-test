@@ -45,9 +45,8 @@ export default function Index() {
           <img
             src={logo}
             alt="UniStyle — E-commerce Hub"
-            className="h-28 md:h-36 w-auto mb-6 drop-shadow-[0_8px_24px_hsl(var(--primary)/0.25)]"
+            className="h-40 md:h-56 w-auto mb-8 drop-shadow-[0_8px_24px_hsl(var(--primary)/0.25)]"
           />
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 text-primary">UniStyle</h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
             Unisex clothing & accessories. Simple. Timeless. For everyone.
           </p>
