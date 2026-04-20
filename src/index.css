@@ -2,37 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
-/* UniStyle — Clean minimal design system (white + black + subtle grays) */
+/* UniStyle — Brand design system: deep teal + gold (from logo) on warm white */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 6%;
+    --background: 40 30% 98%;
+    --foreground: 200 60% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 6%;
+    --card-foreground: 200 60% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 6%;
+    --popover-foreground: 200 60% 12%;
 
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
+    /* Deep teal — pulled from the UniStyle logo wordmark */
+    --primary: 198 75% 18%;
+    --primary-foreground: 40 40% 97%;
 
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 9%;
+    --secondary: 195 30% 94%;
+    --secondary-foreground: 198 75% 18%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 195 25% 95%;
+    --muted-foreground: 200 20% 38%;
 
-    --accent: 0 0% 94%;
-    --accent-foreground: 0 0% 9%;
+    /* Gold — pulled from the logo accent */
+    --accent: 42 70% 55%;
+    --accent-foreground: 198 75% 12%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 0 0% 9%;
+    --border: 195 25% 88%;
+    --input: 195 25% 88%;
+    --ring: 198 75% 18%;
+
+    /* Brand gradient + shadow tokens */
+    --brand-gradient: linear-gradient(135deg, hsl(198 75% 18%), hsl(195 60% 28%) 60%, hsl(42 70% 55%));
+    --shadow-brand: 0 10px 30px -12px hsl(198 75% 18% / 0.25);
 
     --radius: 0.5rem;
 
