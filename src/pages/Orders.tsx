@@ -68,12 +68,12 @@ export default function Orders() {
                     <li key={it.id} className="flex gap-3 items-center text-sm">
                       <img src={it.product_image || "/placeholder.svg"} alt={it.product_name} className="w-12 h-12 object-cover rounded bg-muted" />
                       <span className="flex-1">{it.product_name} × {it.quantity}</span>
-                      <span>${(Number(it.price) * it.quantity).toFixed(2)}</span>
+                      <span>₹{(Number(it.price) * it.quantity).toFixed(2)}</span>
                     </li>
                   ))}
                 </ul>
                 <div className="border-t pt-3 flex justify-between font-semibold">
-                  <span>Total</span><span>${Number(o.total).toFixed(2)}</span>
+                  <span>Total</span><span>₹{Number(o.total).toFixed(2)}</span>
                 </div>
               </CardContent>
             </Card>

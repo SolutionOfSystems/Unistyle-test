@@ -101,7 +101,7 @@ export default function AdminProducts() {
                 </TableCell>
                 <TableCell className="font-medium">{p.name}</TableCell>
                 <TableCell className="capitalize">{p.category}</TableCell>
-                <TableCell>${Number(p.price).toFixed(2)}</TableCell>
+                <TableCell>₹{Number(p.price).toFixed(2)}</TableCell>
                 <TableCell className="text-right">
                   <Button variant="ghost" size="icon" onClick={() => openEdit(p)}><Pencil className="h-4 w-4" /></Button>
                   <Button variant="ghost" size="icon" onClick={() => remove(p.id)}><Trash2 className="h-4 w-4" /></Button>

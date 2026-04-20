@@ -77,7 +77,7 @@ export default function Cart() {
                   />
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium truncate">{item.products?.name}</h3>
-                    <p className="text-sm text-muted-foreground">${Number(item.products?.price ?? 0).toFixed(2)}</p>
+                    <p className="text-sm text-muted-foreground">₹{Number(item.products?.price ?? 0).toFixed(2)}</p>
                     <div className="flex items-center gap-2 mt-2">
                       <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQty(item.id, item.quantity - 1)}>
                         <Minus className="h-3 w-3" />
@@ -89,7 +89,7 @@ export default function Cart() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold">${(Number(item.products?.price ?? 0) * item.quantity).toFixed(2)}</p>
+                    <p className="font-semibold">₹{(Number(item.products?.price ?? 0) * item.quantity).toFixed(2)}</p>
                     <Button variant="ghost" size="icon" onClick={() => remove(item.id)} className="mt-2">
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -103,7 +103,7 @@ export default function Cart() {
             <CardContent className="p-6 flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total</p>
-                <p className="text-2xl font-bold">${total.toFixed(2)}</p>
+                <p className="text-2xl font-bold">₹{total.toFixed(2)}</p>
               </div>
               <Link to="/checkout"><Button size="lg">Checkout</Button></Link>
             </CardContent>
