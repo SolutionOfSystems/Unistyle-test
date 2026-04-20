@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/unistyle-logo.png";
 
 type Product = {
   id: string;
@@ -40,8 +41,13 @@ export default function Index() {
     <main>
       {/* Hero */}
       <section className="border-b border-border bg-secondary">
-        <div className="container mx-auto px-4 py-16 md:py-24 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">UniStyle</h1>
+        <div className="container mx-auto px-4 py-16 md:py-24 text-center flex flex-col items-center">
+          <img
+            src={logo}
+            alt="UniStyle — E-commerce Hub"
+            className="h-28 md:h-36 w-auto mb-6 drop-shadow-[0_8px_24px_hsl(var(--primary)/0.25)]"
+          />
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 text-primary">UniStyle</h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
             Unisex clothing & accessories. Simple. Timeless. For everyone.
           </p>
