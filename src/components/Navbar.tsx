@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import logo from "@/assets/unistyle-logo.png";
+import logo from "@/assets/unistyle-mark.png";
 
 export default function Navbar() {
   const { user, isAdmin, signOut } = useAuth();
