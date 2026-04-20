@@ -4,6 +4,39 @@ A complete, beginner-friendly guide to the UniStyle ecommerce website.
 
 ---
 
+## 0. Branding & Visual Identity
+
+UniStyle has its own custom brand identity built from a logo provided by the team.
+
+### Logo assets
+| File | Where it's used |
+|---|---|
+| `src/assets/unistyle-logo.png` | Full wordmark logo — shown big in the home page **hero section** |
+| `src/assets/unistyle-mark.png` | Small icon-only mark — shown in the **navbar** (top-left) next to the "UniStyle" text |
+| `public/favicon.png` | Browser tab icon (favicon) |
+
+### Color palette (pulled from the logo)
+We use a **deep teal + gold on warm white** palette. All colors are defined as HSL CSS variables in `src/index.css` so they can be reused everywhere through Tailwind classes (`bg-primary`, `text-accent`, etc.).
+
+| Token | HSL value | Meaning |
+|---|---|---|
+| `--background` | `40 30% 98%` | Warm off-white page background |
+| `--foreground` | `200 60% 12%` | Main text color (near-black teal) |
+| `--primary` | `198 75% 18%` | **Deep teal** — buttons, brand text, navbar word |
+| `--accent` | `42 70% 55%` | **Gold** — highlights, premium feel |
+| `--secondary` | `195 30% 94%` | Soft teal-tinted background for hero/sections |
+| `--muted-foreground` | `200 20% 38%` | Subtle helper text |
+| `--brand-gradient` | teal → gold linear gradient | Reusable premium gradient |
+| `--shadow-brand` | soft teal drop shadow | Reusable elevated shadow |
+
+### Why a design system?
+Instead of writing `text-white` or `bg-[#003344]` directly in components, we use **semantic tokens** (`bg-primary`, `text-foreground`). This means:
+- Changing one variable in `index.css` instantly re-themes the whole app.
+- Light/dark mode work automatically.
+- The site stays visually consistent everywhere.
+
+---
+
 ## 1. Project Overview
 
 **UniStyle** is a small online store for **unisex clothing and accessories** (men's wear, women's wear, watches, sunglasses, bags, etc.). It is a **college project** designed to teach the basics of building a real-world web application.
