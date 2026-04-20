@@ -627,6 +627,16 @@ Happy shopping! 🛍️
 
 These diagrams show how data travels from a button click in the browser all the way to the database, and back.
 
+### 14.0 High-level architecture (visual)
+
+![UniStyle Architecture Diagram showing data flow from React frontend through Supabase client to PostgreSQL database](src/assets/architecture-diagram.png)
+
+**How to read it:**
+1. The **React Frontend** (left) is what the user sees and clicks — pages, components, and hooks.
+2. The **Supabase Client** (middle) is a JavaScript bridge: it attaches the user's JWT, talks to the auth service, and sends SQL queries.
+3. **PostgreSQL** (right) stores all our data in tables. Every read/write passes through **Row-Level Security (RLS)** rules first.
+4. Data flows **left → right** when the user does something, and **right → left** when results come back to update the UI.
+
 ### 14.1 General flow (every feature follows this pattern)
 
 ```
