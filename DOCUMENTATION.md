@@ -840,3 +840,152 @@ These diagrams show how data travels from a button click in the browser all the 
 - **ESLint** — A tool that checks the code for common mistakes.
 - **Favicon** — The tiny icon shown in the browser tab.
 
+
+---
+
+## 16. Common Errors & Fixes (Troubleshooting)
+
+When something breaks, check this list first. Most issues fall into one of these buckets.
+
+### 16.1 Auth & Session
+
+**❌ "Auth session missing" / user is `null` after refresh**
+- **Cause:** The auth listener wasn't set up before checking the session, or `localStorage` was cleared.
+- **Fix:** In `useAuth.tsx`, always call `supabase.auth.onAuthStateChange()` **before** `supabase.auth.getSession()`. Already done in this project — don't reorder.
+
+**❌ "Invalid login credentials"**
+- **Cause:** Wrong email/password, or the email isn't confirmed yet.
+- **Fix:** Try signing up again, or in Lovable Cloud → Auth, disable "Confirm email" for faster local testing.
+
+**❌ Logged in but redirected back to `/auth`**
+- **Cause:** `ProtectedRoute` ran before the auth state finished loading.
+- **Fix:** Make sure `ProtectedRoute` waits for `loading === false` before redirecting.
+
+**❌ "User already registered"**
+- **Cause:** That email already exists in `auth.users`.
+- **Fix:** Switch to the Login tab instead of Sign Up.
+
+---
+
+### 16.2 RLS (Row-Level Security)
+
+**❌ `new row violates row-level security policy for table "X"`**
+- **Cause:** The INSERT policy doesn't allow this user to add a row (usually because `user_id` doesn't match `auth.uid()`).
+- **Fix:** Always include `user_id: user.id` in inserts. Verify the table has an `INSERT` policy like `WITH CHECK (auth.uid() = user_id)`.
+
+**❌ Query returns empty array `[]` even though data exists**
+- **Cause:** RLS is silently filtering out rows the user can't see (this is a feature, not a bug).
+- **Fix:** Check the SELECT policy on that table. For admin-only views, ensure `has_role(auth.uid(), 'admin')` returns `true`.
+
+**❌ `permission denied for table X`**
+- **Cause:** RLS is enabled but **no policy** exists for that operation.
+- **Fix:** Add the missing policy (SELECT / INSERT / UPDATE / DELETE) via a migration.
+
+**❌ Infinite recursion detected in policy**
+- **Cause:** A policy queries the same table it protects (common when checking roles from inside `user_roles`).
+- **Fix:** Use the `has_role()` **security definer function** — never query `user_roles` directly inside its own policy.
+
+---
+
+### 16.3 Database & Queries
+
+**❌ `null value in column "X" violates not-null constraint`**
+- **Cause:** You forgot to send a required field in `.insert({...})`.
+- **Fix:** Check the table schema and include all NOT NULL columns (or set defaults in the migration).
+
+**❌ `duplicate key value violates unique constraint`**
+- **Cause:** Trying to insert a row with an ID/email that already exists.
+- **Fix:** Use `.upsert()` instead of `.insert()`, or check existence first with `.maybeSingle()`.
+
+**❌ `.single()` throws "JSON object requested, multiple (or no) rows returned"**
+- **Cause:** Query returned 0 or 2+ rows but `.single()` expects exactly 1.
+- **Fix:** Use `.maybeSingle()` if 0 rows is OK, or fix the filter so it matches exactly one row.
+
+**❌ Query only returns 1000 rows**
+- **Cause:** Supabase's default row limit.
+- **Fix:** Add `.range(0, 4999)` or paginate with `.range(start, end)`.
+
+**❌ Foreign key violation: `is not present in table`**
+- **Cause:** Trying to insert a `product_id` (or similar) that doesn't exist.
+- **Fix:** Verify the referenced row exists before inserting. Reload products list if stale.
+
+---
+
+### 16.4 React & TypeScript
+
+**❌ `Cannot read properties of null (reading 'X')`**
+- **Cause:** Accessing a field on data that hasn't loaded yet.
+- **Fix:** Add a loading guard: `if (!data) return <Loading />` or use optional chaining `data?.field`.
+
+**❌ "Hooks can only be called inside the body of a function component"**
+- **Cause:** Calling `useState` / `useEffect` inside a condition, loop, or non-component function.
+- **Fix:** Move the hook to the top level of the component.
+
+**❌ "Maximum update depth exceeded" (infinite loop)**
+- **Cause:** `useEffect` updates a state that's also in its dependency array, causing a loop.
+- **Fix:** Remove the changing value from dependencies, or update state conditionally.
+
+**❌ `Property 'X' does not exist on type 'never'`**
+- **Cause:** TypeScript can't infer the type from a Supabase query (often after a join).
+- **Fix:** Cast with `(data as any)` for quick fixes, or define an explicit type for the response.
+
+**❌ Page renders twice in development**
+- **Cause:** React Strict Mode (intentional, only in dev).
+- **Fix:** Not a bug — production renders once. Make sure your effects are idempotent.
+
+---
+
+### 16.5 Routing & Navigation
+
+**❌ Blank page after navigating**
+- **Cause:** Route not registered in `App.tsx` or component crashed silently.
+- **Fix:** Check the browser console. Add the route inside `<Routes>` above the `*` catch-all.
+
+**❌ `useNavigate() may be used only in the context of a <Router>`**
+- **Cause:** Component using `useNavigate` is rendered outside `<BrowserRouter>`.
+- **Fix:** Make sure `<BrowserRouter>` wraps the whole app in `App.tsx`.
+
+---
+
+### 16.6 Cart & Checkout
+
+**❌ "Add to Cart" does nothing**
+- **Cause:** User isn't logged in — the button silently redirects.
+- **Fix:** Check toast messages. Confirm `useAuth().user` is not null before the insert.
+
+**❌ Cart shows old items after checkout**
+- **Cause:** `cart_items` weren't deleted, or page wasn't reloaded.
+- **Fix:** Verify the `delete().eq("user_id", user.id)` step ran in `Checkout.tsx`.
+
+**❌ Order total is `$0.00`**
+- **Cause:** `products.price` is null or the join didn't return product data.
+- **Fix:** Ensure all products have a price set in the admin panel.
+
+---
+
+### 16.7 Build & Deployment
+
+**❌ Vite: "Failed to resolve import"**
+- **Cause:** Wrong import path or missing file.
+- **Fix:** Use the `@/` alias for `src/` paths. Check the file actually exists with the exact casing.
+
+**❌ Tailwind classes not applying**
+- **Cause:** Class name was built dynamically (e.g. `bg-${color}`) — Tailwind can't detect it.
+- **Fix:** Use complete class names or map them in a lookup object.
+
+**❌ Environment variable is `undefined`**
+- **Cause:** Vite only exposes vars prefixed with `VITE_`.
+- **Fix:** Use `import.meta.env.VITE_SUPABASE_URL`, never `process.env`.
+
+---
+
+### 16.8 Quick debugging checklist
+
+When stuck, run through this in order:
+
+1. ✅ Open browser DevTools → **Console** — any red errors?
+2. ✅ DevTools → **Network** tab — did the Supabase request return 200, 401, or 403?
+3. ✅ Is the user logged in? `console.log(user)` inside the component.
+4. ✅ Is RLS the problem? Temporarily test the same query as an admin.
+5. ✅ Did the database actually receive the row? Check Lovable Cloud → Table Editor.
+6. ✅ Hard refresh (Ctrl/Cmd + Shift + R) to clear any stale state.
