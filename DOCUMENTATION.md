@@ -620,3 +620,213 @@ UniStyle is a **simple but complete** ecommerce website that demonstrates all th
 4. Refresh — you'll see the **Admin** link.
 
 Happy shopping! 🛍️
+
+---
+
+## 14. Data Flow Diagrams (React → Supabase → Database)
+
+These diagrams show how data travels from a button click in the browser all the way to the database, and back.
+
+### 14.1 General flow (every feature follows this pattern)
+
+```
+┌─────────────┐    ┌──────────────┐    ┌─────────────────┐    ┌──────────────┐
+│   USER      │    │  REACT       │    │  SUPABASE       │    │  POSTGRES    │
+│  (Browser)  │───▶│  COMPONENT   │───▶│  CLIENT (JS)    │───▶│  DATABASE    │
+│  clicks     │    │  (.tsx file) │    │  + RLS check    │    │  (tables)    │
+└─────────────┘    └──────────────┘    └─────────────────┘    └──────────────┘
+                          ▲                                           │
+                          │                                           │
+                          └───────── data comes back ─────────────────┘
+                                  (useState updates UI)
+```
+
+### 14.2 Sign Up / Login flow
+
+```
+  Auth.tsx form
+       │  email + password
+       ▼
+  supabase.auth.signUp() / signInWithPassword()
+       │
+       ▼
+  Supabase Auth service ──▶ auth.users table  (creates user)
+       │
+       ▼
+  Trigger fires ──▶ profiles table   (creates profile row)
+                └─▶ user_roles table (assigns 'user' role)
+       │
+       ▼
+  Session token (JWT) sent back to browser
+       │
+       ▼
+  useAuth hook stores user → Navbar updates → redirect to "/"
+```
+
+### 14.3 Browse Products flow (Home page)
+
+```
+  Index.tsx mounts
+       │
+       ▼
+  useEffect runs once
+       │
+       ▼
+  supabase.from("products").select("*")
+       │
+       ▼
+  RLS policy: "anyone can read products" ✅
+       │
+       ▼
+  PostgreSQL returns rows
+       │
+       ▼
+  setProducts(data) → ProductCard grid renders
+```
+
+### 14.4 Add to Cart flow
+
+```
+  ProductDetail.tsx → "Add to Cart" button
+       │
+       ▼
+  Check useAuth().user
+       │ (if no user → redirect to /auth)
+       ▼
+  supabase.from("cart_items").select() (already in cart?)
+       │
+       ├─ YES → .update({ quantity: qty + 1 })
+       └─ NO  → .insert({ user_id, product_id, quantity: 1 })
+       │
+       ▼
+  RLS checks: user_id = auth.uid() ✅
+       │
+       ▼
+  cart_items table updated → toast "Added to cart"
+```
+
+### 14.5 Checkout flow
+
+```
+  Checkout.tsx → "Place Order"
+       │
+       ▼
+  1. supabase.from("orders").insert({ ... }) ──▶ orders table (new row)
+       │
+       ▼
+  2. supabase.from("order_items").insert([...]) ──▶ order_items table
+       │
+       ▼
+  3. supabase.from("cart_items").delete() ──▶ cart emptied
+       │
+       ▼
+  navigate("/orders") → Orders.tsx loads new order
+```
+
+### 14.6 Admin update order status flow
+
+```
+  AdminOrders.tsx → Select status dropdown
+       │
+       ▼
+  supabase.from("orders").update({ status }).eq("id", ...)
+       │
+       ▼
+  RLS check: has_role(auth.uid(), 'admin') ✅
+       │ (regular users blocked here ❌)
+       ▼
+  orders table updated → reload list → toast "Status updated"
+```
+
+---
+
+## 15. Glossary (every technical word, in one line)
+
+### React & Frontend
+
+- **React** — A JavaScript library for building user interfaces out of reusable pieces.
+- **Component** — A reusable piece of UI written as a function (e.g. `Navbar`, `ProductCard`).
+- **JSX** — HTML-like syntax inside JavaScript files (`<div>Hello</div>`) that React turns into real elements.
+- **TSX** — JSX + TypeScript (adds type-checking to JSX files).
+- **TypeScript** — JavaScript with types, so the editor catches mistakes before you run the code.
+- **Props** — Inputs you pass into a component, like arguments to a function (`<ProductCard product={p} />`).
+- **State** — Data a component remembers and can change (managed with `useState`).
+- **Hook** — A special React function starting with `use` that adds powers to a component (e.g. `useState`, `useEffect`).
+- **useState** — Hook that gives a component a "whiteboard" to remember a value and re-render when it changes.
+- **useEffect** — Hook that runs code at certain moments (when the page opens, or when a value changes).
+- **useContext** — Hook that lets components read shared data (like the logged-in user) without passing props down.
+- **useNavigate** — Hook from React Router that changes the URL in code (e.g. go to `/cart`).
+- **useParams** — Hook that reads dynamic parts of the URL (e.g. the `id` in `/product/:id`).
+- **Render** — When React draws (or re-draws) a component on screen.
+- **Re-render** — React drawing the component again because state or props changed.
+- **Virtual DOM** — React's in-memory copy of the UI used to figure out what changed.
+- **Router** — Code that decides which page to show based on the URL (we use React Router).
+- **Route** — A mapping from a URL (e.g. `/cart`) to a component (e.g. `Cart.tsx`).
+- **Vite** — The fast tool that runs and builds the project during development.
+- **npm package** — A reusable code library you install (e.g. `react`, `lucide-react`).
+
+### Styling
+
+- **CSS** — The language that styles web pages (colors, spacing, fonts).
+- **Tailwind CSS** — A CSS framework where you style with short class names (`p-4`, `bg-primary`).
+- **HSL** — A way to write colors as Hue, Saturation, Lightness — easier to tweak than hex.
+- **Design token** — A named color/spacing value (like `--primary`) reused across the app.
+- **Semantic token** — A token named by purpose, not appearance (`--background` instead of `--white`).
+- **Dark mode** — A theme variant with darker colors, toggled by a CSS class.
+- **shadcn/ui** — A library of pre-built, themeable components (Button, Card, Dialog, etc.).
+- **Responsive design** — UI that adjusts to phone, tablet, and desktop screen sizes.
+
+### Backend, Database & Supabase
+
+- **Backend** — The server side of the app (database, authentication, business logic).
+- **Lovable Cloud** — Lovable's built-in backend (powered by Supabase) — no setup needed.
+- **Supabase** — The open-source backend service that provides the database, auth, and storage.
+- **PostgreSQL (Postgres)** — The actual database engine where all data lives.
+- **Table** — A spreadsheet-like collection of rows in the database (e.g. `products`, `orders`).
+- **Row** — One record in a table (e.g. one product).
+- **Column** — A field in a table (e.g. `price`, `name`).
+- **Primary key** — A unique ID for each row (usually a UUID).
+- **Foreign key** — A column that points to a row in another table (links data together).
+- **UUID** — A long unique ID like `8a7b...` used instead of simple numbers.
+- **Schema** — The blueprint of the database (which tables and columns exist).
+- **Migration** — A SQL file that changes the database structure (create table, add column, etc.).
+- **SQL** — The language used to talk to the database (`SELECT`, `INSERT`, `UPDATE`).
+- **Query** — A request sent to the database to read or change data.
+- **CRUD** — Create, Read, Update, Delete — the four basic data operations.
+- **Trigger** — A function that runs automatically when something happens in the database (e.g. on signup).
+- **Edge function** — Server code that runs close to the user; used for secure logic (we don't need any yet).
+
+### Auth & Security
+
+- **Authentication (auth)** — Proving who you are (logging in).
+- **Authorization** — Deciding what you're allowed to do (e.g. only admins delete products).
+- **JWT** — JSON Web Token — a signed string the server gives you after login that proves your identity.
+- **Session** — Your active logged-in state, kept alive by the JWT.
+- **RLS (Row-Level Security)** — Database rules that decide which rows a user can see or change.
+- **RLS policy** — A specific rule, e.g. "users can only read their own cart items."
+- **Role** — A label like `admin` or `user` that controls permissions.
+- **`has_role()`** — A safe database function we use to check if a user has a role (avoids RLS loops).
+- **Security definer function** — A database function that runs with elevated privileges — used to check roles safely.
+- **OAuth** — A way to log in using another provider (Google, GitHub) — not used here.
+- **Hashing** — One-way scrambling of passwords so they can't be read even by us.
+
+### Async & Data
+
+- **Async / await** — Keywords that let code wait for slow things (like database calls) without freezing the page.
+- **Promise** — An object representing a value that will arrive later (e.g. data from the database).
+- **API** — Application Programming Interface — a way for code to talk to a service.
+- **Supabase client** — The JavaScript object (`supabase`) we use to send queries from React.
+- **JSON** — A text format for data (`{ "name": "Shirt", "price": 20 }`).
+- **Environment variable** — A secret/config value stored outside the code (e.g. the Supabase URL).
+
+### Project & Tooling
+
+- **Repository (repo)** — The folder of code, tracked by Git.
+- **Git** — A tool that records every change you make to the code.
+- **Build** — Turning the source code into optimized files for the browser.
+- **Deploy / Publish** — Putting the built app on the internet so others can visit it.
+- **Toast** — A small popup notification (e.g. "Order placed!").
+- **Lucide icons** — The icon set we use (`<ShoppingCart />`, `<Trash2 />`).
+- **ESLint** — A tool that checks the code for common mistakes.
+- **Favicon** — The tiny icon shown in the browser tab.
+
