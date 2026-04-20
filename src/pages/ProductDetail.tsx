@@ -72,7 +72,7 @@ export default function ProductDetail() {
         <div>
           <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">{product.category}</p>
           <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
-          <p className="text-2xl font-semibold mb-6">${Number(product.price).toFixed(2)}</p>
+          <p className="text-2xl font-semibold mb-6">₹{Number(product.price).toFixed(2)}</p>
           <p className="text-muted-foreground mb-8 leading-relaxed">{product.description}</p>
           <Button size="lg" onClick={addToCart} disabled={adding} className="w-full md:w-auto">
             {adding ? "Adding..." : "Add to Cart"}

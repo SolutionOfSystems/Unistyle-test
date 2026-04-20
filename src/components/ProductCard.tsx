@@ -25,7 +25,7 @@ export default function ProductCard({ product }: { product: Product }) {
         <CardContent className="p-4">
           <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">{product.category}</p>
           <h3 className="font-medium text-sm line-clamp-1">{product.name}</h3>
-          <p className="font-semibold mt-1">${Number(product.price).toFixed(2)}</p>
+          <p className="font-semibold mt-1">₹{Number(product.price).toFixed(2)}</p>
         </CardContent>
       </Card>
     </Link>

@@ -100,12 +100,12 @@ export default function Checkout() {
             {items.map((i) => (
               <li key={i.id} className="flex justify-between">
                 <span>{i.products?.name} × {i.quantity}</span>
-                <span>${(Number(i.products?.price ?? 0) * i.quantity).toFixed(2)}</span>
+                <span>₹{(Number(i.products?.price ?? 0) * i.quantity).toFixed(2)}</span>
               </li>
             ))}
           </ul>
           <div className="border-t pt-3 flex justify-between font-semibold">
-            <span>Total</span><span>${total.toFixed(2)}</span>
+            <span>Total</span><span>₹{total.toFixed(2)}</span>
           </div>
         </CardContent>
       </Card>
@@ -126,7 +126,7 @@ export default function Checkout() {
               💵 Payment Method: <strong>Cash on Delivery</strong>
             </div>
             <Button type="submit" className="w-full" size="lg" disabled={busy}>
-              {busy ? "Placing order..." : `Place Order — $${total.toFixed(2)}`}
+              {busy ? "Placing order..." : `Place Order — ₹${total.toFixed(2)}`}
             </Button>
           </form>
         </CardContent>

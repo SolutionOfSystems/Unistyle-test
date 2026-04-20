@@ -74,12 +74,12 @@ export default function AdminOrders() {
                   {o.order_items.map((it) => (
                     <li key={it.id} className="flex justify-between">
                       <span>{it.product_name} × {it.quantity}</span>
-                      <span>${(Number(it.price) * it.quantity).toFixed(2)}</span>
+                      <span>₹{(Number(it.price) * it.quantity).toFixed(2)}</span>
                     </li>
                   ))}
                 </ul>
                 <div className="border-t pt-3 flex justify-between items-center">
-                  <span className="font-semibold">Total: ${Number(o.total).toFixed(2)}</span>
+                  <span className="font-semibold">Total: ₹{Number(o.total).toFixed(2)}</span>
                   <Select value={o.status} onValueChange={(v) => updateStatus(o.id, v)}>
                     <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
                     <SelectContent>
