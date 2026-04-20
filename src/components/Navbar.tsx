@@ -1,7 +1,8 @@
 // Top navigation bar — visible on every page.
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, Package, LogOut, LogIn, Shield } from "lucide-react";
+import { ShoppingCart, Package, LogOut, LogIn, Shield, User as UserIcon, Moon, Sun } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "@/hooks/useTheme";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +10,7 @@ import logo from "@/assets/unistyle-mark.png";
 
 export default function Navbar() {
   const { user, isAdmin, signOut } = useAuth();
+  const { theme, toggle } = useTheme();
   const navigate = useNavigate();
   const [cartCount, setCartCount] = useState(0);
 
@@ -47,9 +49,14 @@ export default function Navbar() {
           <Link to="/" className="text-sm hover:text-muted-foreground hidden sm:inline">Home</Link>
 
           {user && (
-            <Link to="/orders" className="text-sm hover:text-muted-foreground hidden sm:flex items-center gap-1">
-              <Package className="h-4 w-4" /> Orders
-            </Link>
+            <>
+              <Link to="/orders" className="text-sm hover:text-muted-foreground hidden sm:flex items-center gap-1">
+                <Package className="h-4 w-4" /> Orders
+              </Link>
+              <Link to="/profile" className="text-sm hover:text-muted-foreground hidden sm:flex items-center gap-1">
+                <UserIcon className="h-4 w-4" /> Profile
+              </Link>
+            </>
           )}
 
           {isAdmin && (
@@ -57,6 +64,10 @@ export default function Navbar() {
               <Shield className="h-4 w-4" /> Admin
             </Link>
           )}
+
+          <Button variant="ghost" size="icon" onClick={toggle} aria-label="Toggle theme">
+            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
 
           <Link to="/cart" className="relative">
             <Button variant="ghost" size="icon" aria-label="Cart">
