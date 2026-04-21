@@ -128,10 +128,8 @@ export type Database = {
           description: string | null
           id: string
           image_url: string | null
-          images: string[]
           name: string
           price: number
-          stock: number
         }
         Insert: {
           category: string
@@ -139,10 +137,8 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
-          images?: string[]
           name: string
           price: number
-          stock?: number
         }
         Update: {
           category?: string
@@ -150,10 +146,8 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
-          images?: string[]
           name?: string
           price?: number
-          stock?: number
         }
         Relationships: []
       }
@@ -204,10 +198,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      decrement_stock: {
-        Args: { _product_id: string; _quantity: number }
-        Returns: undefined
-      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

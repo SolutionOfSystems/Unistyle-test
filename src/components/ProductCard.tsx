@@ -1,7 +1,6 @@
 // Reusable product card shown on the home page grid.
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 type Product = {
   id: string;
@@ -9,28 +8,18 @@ type Product = {
   price: number;
   image_url: string | null;
   category: string;
-  stock?: number;
-  images?: string[] | null;
 };
 
 export default function ProductCard({ product }: { product: Product }) {
-  const cover = product.images?.[0] || product.image_url || "/placeholder.svg";
-  const outOfStock = (product.stock ?? 1) <= 0;
-
   return (
     <Link to={`/product/${product.id}`}>
-      <Card className="overflow-hidden hover:shadow-md transition-shadow border-border relative">
-        {outOfStock && (
-          <Badge variant="destructive" className="absolute top-2 right-2 z-10">
-            Out of stock
-          </Badge>
-        )}
+      <Card className="overflow-hidden hover:shadow-md transition-shadow border-border">
         <div className="aspect-square bg-muted overflow-hidden">
           <img
-            src={cover}
+            src={product.image_url || "/placeholder.svg"}
             alt={product.name}
             loading="lazy"
-            className={`w-full h-full object-cover hover:scale-105 transition-transform duration-300 ${outOfStock ? "opacity-60" : ""}`}
+            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           />
         </div>
         <CardContent className="p-4">

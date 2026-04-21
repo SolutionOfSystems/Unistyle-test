@@ -1,4 +1,4 @@
-// Checkout page — collects shipping info, places COD order, decrements stock, clears cart.
+// Checkout page — collects shipping info, places COD order, then clears cart.
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,7 +14,7 @@ type CartRow = {
   id: string;
   quantity: number;
   product_id: string;
-  products: { id: string; name: string; price: number; image_url: string | null; stock: number } | null;
+  products: { id: string; name: string; price: number; image_url: string | null } | null;
 };
 
 export default function Checkout() {
@@ -32,7 +32,7 @@ export default function Checkout() {
       if (!user) return;
       const { data } = await supabase
         .from("cart_items")
-        .select("id, quantity, product_id, products(id, name, price, image_url, stock)")
+        .select("id, quantity, product_id, products(id, name, price, image_url)")
         .eq("user_id", user.id);
       setItems((data as any) ?? []);
     };
@@ -44,21 +44,8 @@ export default function Checkout() {
   const placeOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || items.length === 0) return;
-
-    // Pre-flight stock check so we fail fast before creating an order
-    for (const i of items) {
-      if (!i.products) continue;
-      if (i.quantity > (i.products.stock ?? 0)) {
-        toast({
-          title: "Not enough stock",
-          description: `Only ${i.products.stock} of "${i.products.name}" available.`,
-          variant: "destructive",
-        });
-        return;
-      }
-    }
-
     setBusy(true);
+
     try {
       // 1) Create the order row
       const { data: order, error: orderErr } = await supabase
@@ -86,16 +73,7 @@ export default function Checkout() {
       const { error: itemsErr } = await supabase.from("order_items").insert(orderItems);
       if (itemsErr) throw itemsErr;
 
-      // 3) Decrement stock atomically for each line item via RPC
-      for (const i of items) {
-        const { error: stockErr } = await supabase.rpc("decrement_stock", {
-          _product_id: i.product_id,
-          _quantity: i.quantity,
-        });
-        if (stockErr) throw stockErr;
-      }
-
-      // 4) Empty the user's cart
+      // 3) Empty the user's cart
       await supabase.from("cart_items").delete().eq("user_id", user.id);
 
       toast({ title: "Order placed!", description: "Pay cash on delivery. View it under Orders." });
