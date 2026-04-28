@@ -11,12 +11,17 @@ type Product = {
 };
 
 export default function ProductCard({ product }: { product: Product }) {
+  // Extract the first image URL if multiple are comma-separated
+  const primaryImageUrl = product.image_url
+    ? product.image_url.split(",")[0].trim()
+    : null;
+
   return (
     <Link to={`/product/${product.id}`}>
       <Card className="overflow-hidden hover:shadow-md transition-shadow border-border">
         <div className="aspect-square bg-muted overflow-hidden">
           <img
-            src={product.image_url || "/placeholder.svg"}
+            src={primaryImageUrl || "/placeholder.svg"}
             alt={product.name}
             loading="lazy"
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"

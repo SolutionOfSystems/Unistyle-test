@@ -1,5 +1,5 @@
 // Simple auth hook: tracks the logged-in user, their role, and provides logout.
-// Uses Supabase under the hood (Lovable Cloud).
+// Uses Supabase for authentication and data management.
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session, User } from "@supabase/supabase-js";

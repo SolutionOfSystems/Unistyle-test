@@ -1,11 +1,11 @@
 
 # UniStyle — Simple Ecommerce (College Project)
 
-A clean, beginner-friendly unisex clothing & accessories store using Lovable Cloud (Supabase) for auth + database.
+A clean, beginner-friendly unisex clothing & accessories store using Supabase for auth + database.
 
 ## Tech & Setup
 - React + Tailwind + shadcn/ui (already in project)
-- Lovable Cloud: Auth (email/password) + Postgres + RLS
+- Supabase: Auth (email/password) + Postgres + RLS
 - Clean minimal theme (white + black, subtle grays)
 - Beginner-friendly code with comments throughout
 

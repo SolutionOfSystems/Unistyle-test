@@ -22,6 +22,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
     const load = async () => {
@@ -63,11 +64,36 @@ export default function ProductDetail() {
   if (loading) return <p className="container mx-auto p-8 text-center text-muted-foreground">Loading...</p>;
   if (!product) return <p className="container mx-auto p-8 text-center">Product not found.</p>;
 
+  // Parse comma-separated image URLs
+  const imageUrls = product.image_url
+    ? product.image_url.split(",").map((url) => url.trim()).filter((url) => url)
+    : [];
+  const displayImage = imageUrls.length > 0 ? imageUrls[selectedImageIndex] : "/placeholder.svg";
+
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-        <div className="aspect-square bg-muted rounded-lg overflow-hidden">
-          <img src={product.image_url || "/placeholder.svg"} alt={product.name} className="w-full h-full object-cover" />
+        <div>
+          {/* Main Image */}
+          <div className="aspect-square bg-muted rounded-lg overflow-hidden mb-4">
+            <img src={displayImage} alt={product.name} className="w-full h-full object-cover" />
+          </div>
+          {/* Image Thumbnails */}
+          {imageUrls.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto">
+              {imageUrls.map((url, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setSelectedImageIndex(idx)}
+                  className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                    selectedImageIndex === idx ? "border-primary" : "border-muted"
+                  }`}
+                >
+                  <img src={url} alt={`${product.name} ${idx + 1}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div>
           <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">{product.category}</p>

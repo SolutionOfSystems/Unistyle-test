@@ -78,7 +78,8 @@ Like keeping all your shopping receipts in one folder so you can look back at wh
 ### 🛠️ Admin Panel
 Only the **shop manager (admin)** can:
 - Add new products to the shelves
-- Edit product details (name, price, image)
+- Edit product details (name, price, images)
+  - **Multiple images supported:** Add comma-separated image URLs (e.g., `https://image1.jpg, https://image2.jpg`) to show a product gallery on the detail page
 - Delete products
 - View all customer orders and update their status (Pending → Shipped → Delivered)
 
@@ -242,7 +243,7 @@ Tiny utility helpers that don't belong anywhere else.
 ---
 
 ### 📡 The `src/integrations/supabase/` Room — Telephone to the Database
-This is the **telephone line** to our backend (Lovable Cloud / Supabase).
+This is the **telephone line** to our backend (Supabase).
 - `client.ts` — creates the `supabase` object. Anywhere we want to read or save data, we import this. **Auto-generated, never edit.**
 - `types.ts` — auto-generated TypeScript types that match every table in our database. Gives us autocomplete and catches typos. **Auto-generated, never edit.**
 
@@ -371,6 +372,33 @@ We do **3 small steps**:
 2. Insert each cart item into **order_items** (so we remember what was bought even if products change later).
 3. Delete everything from the user's **cart_items** (the cart is now empty).
 
+### e) Adding Multiple Product Images (`AdminProducts.tsx`)
+When adding or editing a product, you can now add **multiple images** separated by commas:
+```
+https://image1.jpg, https://image2.jpg, https://image3.jpg
+```
+✅ **On the home page:** Shows the first image in the product card  
+✅ **On the product detail page:** Shows a gallery with the first image large, and thumbnail buttons below to switch between images  
+✅ **In the admin table:** Shows the first image in the product list
+
+Example code in ProductDetail.tsx:
+```tsx
+// Parse comma-separated image URLs
+const imageUrls = product.image_url
+  ? product.image_url.split(",").map((url) => url.trim()).filter((url) => url)
+  : [];
+
+// Display main image
+<img src={imageUrls[selectedImageIndex]} alt={product.name} />
+
+// Display thumbnails for switching
+{imageUrls.map((url, idx) => (
+  <button onClick={() => setSelectedImageIndex(idx)}>
+    <img src={url} alt="..." />
+  </button>
+))}
+```
+
 ---
 
 ## 5. Line-by-Line Explanation of Key Functions
@@ -425,7 +453,7 @@ toast({ title: "Added to cart!" });
 // Step 1: Save the main order
 const { data: order } = await supabase.from("orders").insert({
   user_id: user.id,
-  total,                       // total price in dollars
+  total,                       // total price in rupees
   shipping_name: name,         // customer name
   shipping_address: address,   // customer address
   status: "Pending",           // every new order starts as Pending
@@ -500,10 +528,10 @@ For **security**. If we stored the role inside the profile, a user could potenti
 Everything you **see and click** in the browser — buttons, images, forms. We built the frontend with **React** (a JavaScript library) and **Tailwind CSS** (for styling).
 
 ### What is the backend?
-Code that runs on a **server**, not in your browser. It handles things like saving data and authenticating users. We use **Lovable Cloud** (which is powered by Supabase) as our backend.
+Code that runs on a **server**, not in your browser. It handles things like saving data and authenticating users. We use **Supabase** for authentication and the PostgreSQL database.
 
 ### What is a database?
-A giant **organized table** of information. Imagine an Excel sheet with multiple tabs — each tab is a "table" (products, orders, users). We use **PostgreSQL** through Lovable Cloud.
+A giant **organized table** of information. Imagine an Excel sheet with multiple tabs — each tab is a "table" (products, orders, users). We use **PostgreSQL** through Supabase.
 
 ### What is authentication?
 The process of **proving who you are** — like showing your ID card. When you log in with email + password, the system gives your browser a special token to remember you.
@@ -524,7 +552,7 @@ A rule on the database that says "this row can only be seen by user X". Example:
        │
        │  supabase.from("products").select(...)
        ▼
-[ Lovable Cloud / Supabase ]  ← Acts as the backend + database
+[ Supabase ]  ← Acts as the backend + database
        │
        ▼
 [ PostgreSQL Tables ]  ← Real data lives here
@@ -546,7 +574,7 @@ Everything is a loop: **click → code → database → screen**.
 > UniStyle is an ecommerce website that sells unisex clothing and accessories. Users can sign up, browse products, add them to cart, and place an order with Cash on Delivery.
 
 **Q2. What technologies did you use?**
-> React for the frontend, Tailwind CSS for styling, and Lovable Cloud (Supabase) for authentication and the PostgreSQL database.
+> React for the frontend, Tailwind CSS for styling, and Supabase for authentication and the PostgreSQL database.
 
 **Q3. What is a cart?**
 > A temporary list of items a user wants to buy before placing the order. We store it in the `cart_items` table.
@@ -585,7 +613,7 @@ Everything is a loop: **click → code → database → screen**.
 > The customer doesn't pay online. They pay in cash when the order is delivered to their door.
 
 **Q15. How can I become admin in this project?**
-> Sign up normally with the email you want. Then, in the Lovable Cloud database editor, run:
+> Sign up normally with the email you want. Then, in the Supabase dashboard, run:
 > ```sql
 > UPDATE user_roles SET role = 'admin' WHERE user_id = '<your-user-id>';
 > ```
@@ -597,7 +625,7 @@ Everything is a loop: **click → code → database → screen**.
 
 UniStyle is a **simple but complete** ecommerce website that demonstrates all the key parts of a real-world web app:
 - A **frontend** built with React and Tailwind CSS
-- A **backend + database** powered by Lovable Cloud (Supabase)
+- A **backend + database** powered by Supabase
 - **Authentication** with email and password
 - **Role-based access** for admins
 - **Row-Level Security** so users can only see their own data
@@ -611,7 +639,7 @@ UniStyle is a **simple but complete** ecommerce website that demonstrates all th
 
 ### How to make yourself admin (for the demo)
 1. Sign up with your email through the site.
-2. Open Lovable Cloud → SQL editor.
+2. Open Supabase dashboard → SQL editor.
 3. Run:
    ```sql
    UPDATE user_roles SET role = 'admin'
@@ -789,7 +817,7 @@ These diagrams show how data travels from a button click in the browser all the 
 ### Backend, Database & Supabase
 
 - **Backend** — The server side of the app (database, authentication, business logic).
-- **Lovable Cloud** — Lovable's built-in backend (powered by Supabase) — no setup needed.
+- **Supabase** — Open-source backend service for authentication, database, and storage.
 - **Supabase** — The open-source backend service that provides the database, auth, and storage.
 - **PostgreSQL (Postgres)** — The actual database engine where all data lives.
 - **Table** — A spreadsheet-like collection of rows in the database (e.g. `products`, `orders`).
@@ -855,7 +883,7 @@ When something breaks, check this list first. Most issues fall into one of these
 
 **❌ "Invalid login credentials"**
 - **Cause:** Wrong email/password, or the email isn't confirmed yet.
-- **Fix:** Try signing up again, or in Lovable Cloud → Auth, disable "Confirm email" for faster local testing.
+- **Fix:** Try signing up again, or in Supabase dashboard → Auth, disable "Confirm email" for faster local testing.
 
 **❌ Logged in but redirected back to `/auth`**
 - **Cause:** `ProtectedRoute` ran before the auth state finished loading.
@@ -987,5 +1015,5 @@ When stuck, run through this in order:
 2. ✅ DevTools → **Network** tab — did the Supabase request return 200, 401, or 403?
 3. ✅ Is the user logged in? `console.log(user)` inside the component.
 4. ✅ Is RLS the problem? Temporarily test the same query as an admin.
-5. ✅ Did the database actually receive the row? Check Lovable Cloud → Table Editor.
+5. ✅ Did the database actually receive the row? Check Supabase dashboard → Table Editor.
 6. ✅ Hard refresh (Ctrl/Cmd + Shift + R) to clear any stale state.

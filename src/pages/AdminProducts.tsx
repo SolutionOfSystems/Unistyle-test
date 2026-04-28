@@ -94,10 +94,15 @@ export default function AdminProducts() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.map((p) => (
+            {products.map((p) => {
+              // Extract the first image URL if multiple are comma-separated
+              const primaryImageUrl = p.image_url
+                ? p.image_url.split(",")[0].trim()
+                : null;
+              return (
               <TableRow key={p.id}>
                 <TableCell>
-                  <img src={p.image_url || "/placeholder.svg"} alt={p.name} className="w-12 h-12 object-cover rounded bg-muted" />
+                  <img src={primaryImageUrl || "/placeholder.svg"} alt={p.name} className="w-12 h-12 object-cover rounded bg-muted" />
                 </TableCell>
                 <TableCell className="font-medium">{p.name}</TableCell>
                 <TableCell className="capitalize">{p.category}</TableCell>
@@ -107,7 +112,8 @@ export default function AdminProducts() {
                   <Button variant="ghost" size="icon" onClick={() => remove(p.id)}><Trash2 className="h-4 w-4" /></Button>
                 </TableCell>
               </TableRow>
-            ))}
+            );
+            })}
           </TableBody>
         </Table>
       </div>
@@ -121,7 +127,7 @@ export default function AdminProducts() {
               <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
             </div>
             <div>
-              <Label>Price ($)</Label>
+              <Label>Price (₹)</Label>
               <Input type="number" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required />
             </div>
             <div>
@@ -136,8 +142,8 @@ export default function AdminProducts() {
               </Select>
             </div>
             <div>
-              <Label>Image URL</Label>
-              <Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://..." />
+              <Label>Image URLs (comma-separated)</Label>
+              <Textarea value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://image1.jpg, https://image2.jpg, https://image3.jpg" rows={2} />
             </div>
             <div>
               <Label>Description</Label>
