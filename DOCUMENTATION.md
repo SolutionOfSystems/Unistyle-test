@@ -619,6 +619,9 @@ Everything is a loop: **click → code → database → screen**.
 > ```
 > Refresh the page — the **Admin** link will appear in the navbar.
 
+**Q16. How is this project deployed?**
+> The project is deployed to **GitHub Pages** using **GitHub Actions**. When I push code to the main branch, GitHub Actions automatically runs a workflow that installs dependencies, builds the Vite app, and deploys the built files to GitHub Pages. The `base` URL in `vite.config.ts` ensures assets load correctly from the subfolder.
+
 ---
 
 ## 11. Conclusion
@@ -648,6 +651,245 @@ UniStyle is a **simple but complete** ecommerce website that demonstrates all th
 4. Refresh — you'll see the **Admin** link.
 
 Happy shopping! 🛍️
+
+---
+
+## 12. Deployment Guide (GitHub Pages)
+
+This section explains how to deploy UniStyle to GitHub Pages so anyone can visit your live website.
+
+### 12.1 What is GitHub Pages?
+
+**GitHub Pages** is a free hosting service from GitHub that lets you publish websites directly from your repository. Think of it like a **free display window** for your project — once deployed, anyone with the link can see and use your website.
+
+### 12.2 Prerequisites
+
+Before deploying, you need:
+1. A GitHub account
+2. Your code pushed to a GitHub repository
+3. The repository must be **public** (GitHub Pages is free for public repos)
+
+### 12.3 Step-by-Step Deployment
+
+#### Step 1: Configure Vite for GitHub Pages
+
+Open `vite.config.ts` and add the `base` property:
+
+```ts
+export default defineConfig(() => ({
+  base: "/YOUR_REPO_NAME/",  // ← Add this line
+  server: { ... },
+  plugins: [react()],
+  resolve: { ... },
+}));
+```
+
+**Why this matters:** GitHub Pages serves your site from a subfolder (e.g., `username.github.io/repo-name/`). The `base` setting tells Vite to look for assets (JS, CSS, images) in that subfolder instead of the root.
+
+**Example:** If your repo is named `Unistyle-test`, use `base: "/Unistyle-test/"`.
+
+#### Step 2: Create the GitHub Actions Workflow
+
+Create a file at `.github/workflows/deploy.yml`:
+
+```yaml
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Build
+        run: npm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+**What this workflow does:**
+1. **Triggers** on every push to the `main` branch
+2. **Installs** dependencies (using `--legacy-peer-deps` to handle version conflicts)
+3. **Builds** your Vite app (creates the `dist/` folder)
+4. **Deploys** the `dist/` folder to GitHub Pages
+
+#### Step 3: Enable GitHub Pages in Repository Settings
+
+1. Go to your repository on GitHub
+2. Click **Settings** → **Pages** (in the left sidebar)
+3. Under **"Build and deployment"** → **"Source"**
+4. Select **"GitHub Actions"** (not "Deploy from a branch")
+5. Click **Save**
+
+**Important:** You must select **"GitHub Actions"** as the source, not "Deploy from a branch". The workflow we created will handle the deployment automatically.
+
+#### Step 4: Push Your Code
+
+Commit and push all changes:
+
+```bash
+git add .
+git commit -m "Setup GitHub Pages deployment"
+git push origin main
+```
+
+#### Step 5: Monitor the Deployment
+
+1. Go to your repository → **Actions** tab
+2. Watch the workflow run (it takes 2-3 minutes)
+3. When the green checkmark appears, your site is live!
+4. Visit: `https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/`
+
+---
+
+### 12.4 Common Deployment Issues & Fixes
+
+#### ❌ Blank White Page (404 Errors in Console)
+
+**Symptoms:** The site loads but shows only a blank white page. Browser console shows 404 errors for JS/CSS files.
+
+**Cause:** The `base` URL in `vite.config.ts` is incorrect or missing.
+
+**Fix:**
+1. Open `vite.config.ts`
+2. Ensure `base: "/YOUR_REPO_NAME/"` matches your repository name exactly (case-sensitive)
+3. Rebuild and push
+
+#### ❌ "Failed to resolve dependency" / npm install errors
+
+**Symptoms:** GitHub Actions workflow fails at the "Install dependencies" step with peer dependency errors.
+
+**Cause:** Your project uses Vite 8, but some plugins expect Vite 5-7. npm blocks installation due to version conflicts.
+
+**Fix:**
+Update your workflow file to use `--legacy-peer-deps`:
+
+```yaml
+- name: Install dependencies
+  run: npm install --legacy-peer-deps
+```
+
+This tells npm to ignore version conflicts and install anyway.
+
+#### ❌ Multiple Workflow Files Causing Conflicts
+
+**Symptoms:** The site deploys but shows the wrong content (raw source files instead of built app), or deployments behave unpredictably.
+
+**Cause:** GitHub automatically created workflow files (like `static.yml` or `jekyll-gh-pages.yml`) that conflict with your custom Vite workflow.
+
+**Fix:**
+1. Check `.github/workflows/` folder
+2. Delete any files you didn't create:
+   - `static.yml` — Deploys raw source code (wrong for Vite apps)
+   - `jekyll-gh-pages.yml` — Uses Jekyll build system (wrong for Vite apps)
+3. Keep only your `deploy.yml` file
+4. Push the changes
+
+#### ❌ "Site not found" or 404 Page
+
+**Symptoms:** Visiting the URL shows "404 File not found" or "There isn't a GitHub Pages site here."
+
+**Cause:** GitHub Pages hasn't finished building, or the source setting is wrong.
+
+**Fix:**
+1. Go to Settings → Pages → Source
+2. Ensure **"GitHub Actions"** is selected (not "Deploy from a branch")
+3. Wait 2-3 minutes after pushing code
+4. Check the Actions tab for any failed workflow runs
+
+#### ❌ Changes Not Appearing After Push
+
+**Symptoms:** You pushed new code but the live site still shows the old version.
+
+**Fix:**
+1. Go to Actions tab and confirm the workflow completed successfully (green checkmark)
+2. Wait 1-2 minutes for GitHub Pages cache to clear
+3. Hard refresh the page: `Ctrl + Shift + R` (Windows) or `Cmd + Shift + R` (Mac)
+4. Check browser DevTools → Network → Disable cache, then refresh
+
+---
+
+### 12.5 Deployment Checklist
+
+Before each deployment, verify:
+
+- [ ] `vite.config.ts` has `base: "/REPO_NAME/"` set correctly
+- [ ] `.github/workflows/deploy.yml` exists and uses `--legacy-peer-deps`
+- [ ] GitHub Settings → Pages → Source is set to "GitHub Actions"
+- [ ] No conflicting workflow files in `.github/workflows/`
+- [ ] All changes committed and pushed to `main` branch
+- [ ] Workflow completed successfully (green checkmark in Actions tab)
+
+---
+
+### 12.6 How It Works (Simple Explanation)
+
+When you push code to GitHub, here's what happens behind the scenes:
+
+```
+You push code ──▶ GitHub Actions starts
+                      │
+                      ▼
+              Ubuntu server spins up
+                      │
+                      ▼
+              npm install --legacy-peer-deps
+              (downloads all dependencies)
+                      │
+                      ▼
+              npm run build
+              (Vite compiles your code)
+                      │
+                      ▼
+              dist/ folder created
+              (contains optimized website files)
+                      │
+                      ▼
+              GitHub Pages serves dist/ folder
+                      │
+                      ▼
+              Site live at username.github.io/repo-name/
+```
+
+Think of it like a **factory assembly line**:
+1. Raw materials (your code) arrive
+2. Workers install parts (npm install)
+3. Factory builds the product (npm run build)
+4. Product shipped to store (deploy to GitHub Pages)
+5. Customers can now buy it (visit the live site)
 
 ---
 
@@ -863,6 +1105,12 @@ These diagrams show how data travels from a button click in the browser all the 
 - **Git** — A tool that records every change you make to the code.
 - **Build** — Turning the source code into optimized files for the browser.
 - **Deploy / Publish** — Putting the built app on the internet so others can visit it.
+- **GitHub Pages** — Free hosting service from GitHub for static websites.
+- **GitHub Actions** — Automated workflows that run when you push code (like building and deploying).
+- **Workflow** — A set of automated steps defined in `.github/workflows/` (e.g., build on push).
+- **base URL** — The root path where your site is hosted (`/repo-name/` for GitHub Pages).
+- **CI/CD** — Continuous Integration / Continuous Deployment — automatically building and deploying when code changes.
+- **Artifact** — The built files (like `dist/` folder) that get deployed.
 - **Toast** — A small popup notification (e.g. "Order placed!").
 - **Lucide icons** — The icon set we use (`<ShoppingCart />`, `<Trash2 />`).
 - **ESLint** — A tool that checks the code for common mistakes.
@@ -1004,6 +1252,13 @@ When something breaks, check this list first. Most issues fall into one of these
 **❌ Environment variable is `undefined`**
 - **Cause:** Vite only exposes vars prefixed with `VITE_`.
 - **Fix:** Use `import.meta.env.VITE_SUPABASE_URL`, never `process.env`.
+
+**❌ GitHub Pages deployment issues (blank page, 404s, build failures)**
+- **See Section 12:** "Deployment Guide (GitHub Pages)" for complete setup instructions and all common fixes.
+- **Quick fixes:**
+  - Blank page → Check `base: "/REPO_NAME/"` in `vite.config.ts`
+  - npm install fails → Use `--legacy-peer-deps` in workflow
+  - Wrong content showing → Delete conflicting `static.yml` / `jekyll-gh-pages.yml` files
 
 ---
 
